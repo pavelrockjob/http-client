@@ -22,10 +22,10 @@ class Client
         'DELETE'
     ];
 
-    private array $config = [];
+    private array $config;
 
     public function __construct(ClientConfig $clientConfig){
-        $this->config = $clientConfig->getConfig();
+        $this->config = $clientConfig;
     }
 
     public function setUrl(string $url): self
@@ -72,6 +72,8 @@ class Client
         if (!$this->url || !$this->method) {
             throw new Exception('error');
         }
+
+        $this->config->getTimeout();
 
         $ch = curl_init(!empty($this->query) ? join('?', [$this->url, $this->query]) : $this->url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $this->method);

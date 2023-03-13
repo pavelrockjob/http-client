@@ -10,6 +10,14 @@ class ClientConfig
 
     private string $baseUrl = '';
 
+    public function __construct(array $configs = array()){
+        foreach($configs as $key => $config){
+            if(property_exists($this, $key)){
+                $this->{$key} = $config;
+            }
+        }
+    }
+
     public function timeout(float $timeout): self
     {
         $this->timeout = $timeout;
@@ -24,11 +32,13 @@ class ClientConfig
         return $this;
     }
 
-    public function getConfig(): array
+    public function getBaseUrl(): string
     {
-        return [
-            'timeout' => $this->timeout,
-            'baseUrl' => $this->baseUrl,
-        ];
+        return $this->baseUrl;
+    }
+
+    public function getTimeout(): string
+    {
+        return $this->timeout;
     }
 }
