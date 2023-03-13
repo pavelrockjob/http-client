@@ -7,6 +7,7 @@ use Exception;
 class Client
 {
     private string $url;
+
     private string $method;
 
     private string $query = '';
@@ -20,6 +21,12 @@ class Client
         'PATCH',
         'DELETE'
     ];
+
+    private array $config = [];
+
+    public function __construct(ClientConfig $clientConfig){
+        $this->config = $clientConfig->getConfig();
+    }
 
     public function setUrl(string $url): self
     {
@@ -69,8 +76,8 @@ class Client
         $ch = curl_init(!empty($this->query) ? join('?', [$this->url, $this->query]) : $this->url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $this->method);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt( $ch, CURLOPT_POSTFIELDS, json_encode($this->body) );
-        curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->body) );
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
 
         curl_setopt($ch, CURLOPT_HEADERFUNCTION,
             function ($curl, $header) use (&$headers) {

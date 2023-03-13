@@ -1,8 +1,12 @@
 <?php
 
+use Http\Client\ClientConfig;
+
 require_once __DIR__ . '/vendor/autoload.php';
 
-$client = new \Http\Client\Client();
+$config = (new ClientConfig())->baseUrl('test')->timeout(3.00);
+
+$client = new \Http\Client\Client($config);
 $response = $client->setUrl('https://fakestoreapi.com/products')
 //    ->setQuery(['limit' => 1])
     ->setBody([
