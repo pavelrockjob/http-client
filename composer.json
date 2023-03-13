@@ -10,11 +10,15 @@
     }
   ],
   "require": {
-    "ext-sqlite3": "*"
+    "ext-sqlite3": "*",
+    "ext-curl": "*"
   },
   "autoload" : {
     "psr-4": {
       "Http\\Client\\": "src/"
     }
+  },
+  "require-dev": {
+    "symfony/var-dumper": "^5.4"
   }
 }
