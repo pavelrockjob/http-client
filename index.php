@@ -1,8 +1,10 @@
 <?php
 
+require_once __DIR__ . '/vendor/autoload.php';
 
-$clent = (new http\Client())
-    ->setUrl()
-    ->setMethod()
-    ->sedData([])
-    ->send();
+$client = new \Http\Client\Client();
+/**
+ * @var CurlHandle $response;
+ */
+$response = $client->setUrl('sdgsdhs')->setMethod('GET')->send();
+//var_dump($response);
