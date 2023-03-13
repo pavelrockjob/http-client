@@ -9,6 +9,10 @@ class Client
     private string $url;
     private string $method;
 
+    private string $query = '';
+
+    private array $body = [];
+
     const METHODS = [
         'PUT',
         'GET',
@@ -35,6 +39,24 @@ class Client
         return $this;
     }
 
+    public function setQuery(array $params): self
+    {
+        $this->query = http_build_query($params);
+
+        return $this;
+    }
+
+    public function setBody(array $params): self
+    {
+        if (isset($this->method) && $this->method === 'GET') {
+            throw new Exception('error');
+        }
+
+        $this->body = $params;
+
+        return $this;
+    }
+
     /**
      * @throws Exception
      */
@@ -44,9 +66,11 @@ class Client
             throw new Exception('error');
         }
 
-        $ch = curl_init($this->url);
+        $ch = curl_init(!empty($this->query) ? join('?', [$this->url, $this->query]) : $this->url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $this->method);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt( $ch, CURLOPT_POSTFIELDS, json_encode($this->body) );
+        curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
 
         curl_setopt($ch, CURLOPT_HEADERFUNCTION,
             function ($curl, $header) use (&$headers) {
