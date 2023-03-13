@@ -8,7 +8,8 @@ class Curl
     private QueryBuilder $queryBuilder;
     private RequestBuilder $requestBuilder;
 
-    public function __construct(QueryBuilder $queryBuilder, RequestBuilder $requestBuilder){
+    public function __construct(QueryBuilder $queryBuilder, RequestBuilder $requestBuilder)
+    {
         $this->queryBuilder = $queryBuilder;
         $this->requestBuilder = $requestBuilder;
     }
