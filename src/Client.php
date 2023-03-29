@@ -9,19 +9,11 @@ class Client
 {
     private string $url;
 
-    private string $method;
+    private RequestType $method;
 
     private string $query = '';
 
     private array $body = [];
-
-    const METHODS = [
-        'PUT',
-        'GET',
-        'POST',
-        'PATCH',
-        'DELETE'
-    ];
 
     private ClientConfig $clientConfig;
 
@@ -44,7 +36,7 @@ class Client
             ? $this->setQuery($params)
             : $this->setBody($params);
 
-        $this->setMethod($method->value);
+        $this->setMethod($method);
         $this->setUrl($url);
 
         return $this;
@@ -60,12 +52,8 @@ class Client
     /**
      * @throws Exception
      */
-    public function setMethod(string $method): self
+    public function setMethod(RequestType $method): self
     {
-        if (!in_array($method, self::METHODS)) {
-            throw new Exception('error');
-        }
-
         $this->method = $method;
 
         return $this;
@@ -83,7 +71,7 @@ class Client
      */
     public function setBody(array $params): self
     {
-        if (isset($this->method) && $this->method === 'GET') {
+        if (isset($this->method) && $this->method === RequestType::GET) {
             throw new Exception('error');
         }
 
@@ -101,9 +89,8 @@ class Client
             throw new Exception('error');
         }
 
-//        $this->config->getTimeout();
         $ch = curl_init(!empty($this->query) ? join('?', [$this->url, $this->query]) : $this->url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $this->method);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $this->method->value);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->body) );
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->body) );
@@ -123,17 +110,16 @@ class Client
             }
         );
 
+
         $result = $content = curl_exec($ch);
 
         if (!curl_errno($ch)) {
             $result = curl_getinfo($ch);
+        } else {
+            throw new Exception(curl_error($ch));
         }
 
         curl_close($ch);
-
-        if(!$result){
-            throw new Exception('timeout');
-        }
 
         return (new ClientResponse($result, $content, $headers));
     }
