@@ -22,7 +22,7 @@ class Client
         'DELETE'
     ];
 
-    private array $config;
+    private ClientConfig $config;
 
     public function __construct(ClientConfig $clientConfig){
         $this->config = $clientConfig;
@@ -73,7 +73,7 @@ class Client
             throw new Exception('error');
         }
 
-        $this->config->getTimeout();
+//        $this->config->getTimeout();
 
         $ch = curl_init(!empty($this->query) ? join('?', [$this->url, $this->query]) : $this->url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $this->method);
