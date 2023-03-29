@@ -6,7 +6,7 @@ use Exception;
 
 class ClientConfig
 {
-    private float $timeout = 10.00;
+    private int $timeout = 10;
 
     private string $baseUrl = '';
 

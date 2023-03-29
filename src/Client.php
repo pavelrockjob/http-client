@@ -3,6 +3,7 @@
 namespace Http\Client;
 
 use Exception;
+use Http\Client\Enums\RequestType;
 
 class Client
 {
@@ -22,10 +23,31 @@ class Client
         'DELETE'
     ];
 
-    private ClientConfig $config;
+    private ClientConfig $clientConfig;
 
     public function __construct(ClientConfig $clientConfig){
-        $this->config = $clientConfig;
+        $this->clientConfig = $clientConfig;
+    }
+
+    /**
+     * @param RequestType $method
+     * @param string $url
+     * @param array $params
+     * @return $this
+     * @throws Exception
+     */
+    public function request(RequestType $method, string $url, array $params): self
+    {
+        $this->setBody($params);
+
+        $method === RequestType::GET
+            ? $this->setQuery($params)
+            : $this->setBody($params);
+
+        $this->setMethod($method->value);
+        $this->setUrl($url);
+
+        return $this;
     }
 
     public function setUrl(string $url): self
@@ -35,6 +57,9 @@ class Client
         return $this;
     }
 
+    /**
+     * @throws Exception
+     */
     public function setMethod(string $method): self
     {
         if (!in_array($method, self::METHODS)) {
@@ -53,6 +78,9 @@ class Client
         return $this;
     }
 
+    /**
+     * @throws Exception
+     */
     public function setBody(array $params): self
     {
         if (isset($this->method) && $this->method === 'GET') {
@@ -74,11 +102,12 @@ class Client
         }
 
 //        $this->config->getTimeout();
-
         $ch = curl_init(!empty($this->query) ? join('?', [$this->url, $this->query]) : $this->url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $this->method);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->body) );
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($this->body) );
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, $this->clientConfig->getTimeout());
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
 
         curl_setopt($ch, CURLOPT_HEADERFUNCTION,
@@ -101,6 +130,10 @@ class Client
         }
 
         curl_close($ch);
+
+        if(!$result){
+            throw new Exception('timeout');
+        }
 
         return (new ClientResponse($result, $content, $headers));
     }
